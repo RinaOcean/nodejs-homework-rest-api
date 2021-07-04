@@ -69,7 +69,7 @@ router.post('/', async (req, res, next) => {
 
 router.delete('/:contactId', async (req, res, next) => {
   const { contactId } = req.params
-  const id = +contactId
+  const id = contactId
   const remove = await removeContact(id)
 
   if (remove) {

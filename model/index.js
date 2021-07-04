@@ -31,13 +31,13 @@ const getContactById = async (contactId) => {
 const removeContact = async (contactId) => {
   try {
     const allContacts = await listContacts()
-    const index = allContacts.findIndex((contact) => contact.id === contactId)
+    const index = allContacts.findIndex((contact) => contact.id.toString() === contactId.toString())
     if (index === -1) {
       return false
     }
-    const updateContacts = contacts.filter(contact => contacts.indexOf(contact) !== index)
-    const newContactlist = JSON.stringify([...updateContacts])
-    fs.writeFile(contactsPath, newContactlist)
+    allContacts.splice(index, 1,)
+    const updatedContacts = JSON.stringify([...allContacts])
+    fs.writeFile(contactsPath, updatedContacts)
   } catch (error) {
     console.error(error)
   }
@@ -50,7 +50,7 @@ const addContact = async (body) => {
     const newContact = { id: nanoid(), name, email, phone }
 
     const allContacts = await listContacts()
-    console.log(newContact)
+
     const updateContacts = JSON.stringify([newContact, ...allContacts])
     fs.writeFile(contactsPath, updateContacts)
     return newContact
