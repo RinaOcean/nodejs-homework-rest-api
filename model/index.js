@@ -1,6 +1,7 @@
 const fs = require('fs').promises
 const path = require('path')
-// const contacts = require('./contacts.json')
+
+const contacts = require('./contacts.json')
 
 const contactsPath = path.join(__dirname, './contacts.json')
 
@@ -27,11 +28,52 @@ const getContactById = async (contactId) => {
   }
 }
 
-const removeContact = async (contactId) => { }
+const removeContact = async (contactId) => {
+  try {
+    const allContacts = await listContacts()
+    const index = allContacts.findIndex((contact) => contact.id === contactId)
+    if (index === -1) {
+      return false
+    }
+    const updateContacts = contacts.filter(contact => contacts.indexOf(contact) !== index)
+    const newContactlist = JSON.stringify([...updateContacts])
+    fs.writeFile(contactsPath, newContactlist)
+  } catch (error) {
+    console.error(error)
+  }
+}
 
-const addContact = async (body) => { }
+const addContact = async (body) => {
+  try {
+    const { name, email, phone } = body
 
-const updateContact = async (contactId, body) => { }
+    const newContact = { id: nanoid(), name, email, phone }
+
+    const allContacts = await listContacts()
+    console.log(newContact)
+    const updateContacts = JSON.stringify([newContact, ...allContacts])
+    fs.writeFile(contactsPath, updateContacts)
+    return newContact
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const updateContact = async (contactId, body) => {
+  // const { name, email, phone } = body
+  const allContacts = await listContacts()
+  const index = allContacts.findIndex((contact) => contact.id === contactId)
+  if (index === -1) {
+    return false
+  }
+
+  let updatedContact = allContacts.find((contact) => contact.id === contactId)
+  updatedContact = { ...allContacts[index], ...body }
+  allContacts.splice(index, 1, updatedContact)
+  const updatedContacts = JSON.stringify([...allContacts])
+  fs.writeFile(contactsPath, updatedContacts)
+  return updatedContact
+}
 
 module.exports = {
   listContacts,
