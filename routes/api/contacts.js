@@ -72,7 +72,7 @@ router.delete('/:contactId', async (req, res, next) => {
   const id = contactId
   const remove = await removeContact(id)
 
-  if (!remove) {
+  if (remove === false) {
     res.status(404).json({
       status: 'error',
       code: 404,
