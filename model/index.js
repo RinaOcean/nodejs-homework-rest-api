@@ -1,11 +1,13 @@
-const fs = require('fs').promises
-const path = require('path')
+// const fs = require('fs').promises
+// const path = require('path')
 
-const contacts = require('./contacts.json')
+// const contacts = require('./contacts.json')
 
-const contactsPath = path.join(__dirname, './contacts.json')
+// const contactsPath = path.join(__dirname, './contacts.json')
 
-const { nanoid } = require('nanoid')
+// const { nanoid } = require('nanoid')
+
+const db = require('../db/connection')
 
 const listContacts = async () => {
   try {
