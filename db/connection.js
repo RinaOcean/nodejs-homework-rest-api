@@ -9,7 +9,7 @@ const db = mongoose.connect(config.MONGO_CONNECTION_STRING, {
 const dbConnect = mongoose.connection
 dbConnect.on('error', console.error.bind(console, 'connection error:'))
 dbConnect.once('open', function () {
-  console.log('Connected to mongoDB!!!')
+  console.log('Database connection successful')
 })
 
 module.exports = db

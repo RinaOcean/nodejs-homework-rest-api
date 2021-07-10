@@ -1,23 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const Joi = require('joi')
-const {
-  listContacts,
-  getContactById,
-  addContact,
-  removeContact,
-  updateContact,
-} = require('../../model')
+// const Joi = require('joi')
+const contactCtrls = require('../../controllers/contact.controllers')
 
-router.get('/', async (req, res, next) => {
-  const contactsList = await listContacts()
-  res.json({
-    status: 'success',
-    code: 200,
-    data: { contactsList, },
-    message: 'OK',
-  })
-})
+router.get('/', contactCtrls.listContacts)
 
 router.get('/:contactId', async (req, res, next) => {
   const { contactId } = req.params
@@ -41,31 +27,7 @@ router.get('/:contactId', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
-  const bodySchema = Joi.object({
-    name: Joi.string().min(2).required(),
-    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
-    phone: Joi.string().required(),
-  })
-  const { error } = bodySchema.validate(req.body)
-  if (error) {
-    return res.status(400).json({
-      status: 'bad request',
-      code: 400,
-      message: error.message,
-    })
-  }
-
-  const body = req.body
-  const contact = await addContact(body)
-
-  res.status(201).json({
-    status: 'success',
-    code: 201,
-    data: { contact },
-    message: 'new contact added',
-  })
-})
+router.post('/', contactCtrls.addContact)
 
 router.delete('/:contactId', async (req, res, next) => {
   const { contactId } = req.params

@@ -9,9 +9,10 @@
 
 const db = require('../db/connection')
 
-const listContacts = async () => {
+const listContacts = async (req, res) => {
+  const { body } = req
   try {
-    const rawContacts = await fs.readFile(contactsPath)
+    const result = await fs.readFile(contactsPath)
     const allContacts = JSON.parse(rawContacts)
 
     return allContacts
