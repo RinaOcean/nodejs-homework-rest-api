@@ -23,19 +23,19 @@ const listContacts = async (req, res) => {
 }
 
 const addContact = async (req, res) => {
-  // const bodySchema = Joi.object({
-  //   name: Joi.string().min(2).required(),
-  //   email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
-  //   phone: Joi.string().required(),
-  // })
-  // const { error } = bodySchema.validate(req.body)
-  // if (error) {
-  //   return res.status(HTTP_STATUS.BAD_REQUEST).json({
-  //     status: 'bad request',
-  //     code: HTTP_STATUS.BAD_REQUEST,
-  //     message: error.message,
-  //   })
-  // }
+  const bodySchema = Joi.object({
+    name: Joi.string().min(2).required(),
+    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
+    phone: Joi.string().pattern(/^(\(\d{3}\))(\s)\d{3}(-)\d{4}$/).required(),
+  })
+  const { error } = bodySchema.validate(req.body)
+  if (error) {
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
+      status: 'bad request',
+      code: HTTP_STATUS.BAD_REQUEST,
+      message: 'email should ends with \'com\' or \'net\', phone should be in (XXX) XXX-XXXX format',
+    })
+  }
 
   const body = req.body
 
@@ -90,15 +90,8 @@ const removeContact = async (req, res) => {
   const id = req.params.contactId
 
   try {
-    const result = await Contact.findOneAndDelete({ _id: id })
+    await Contact.findOneAndDelete({ _id: id })
 
-    if (!result) {
-      res.status(HTTP_STATUS.NO_CONTENT).json({
-        status: 'error',
-        code: HTTP_STATUS.NOT_FOUND,
-        message: 'contact not found'
-      })
-    }
     res.json({
       message: 'contact removed'
     })
@@ -106,9 +99,82 @@ const removeContact = async (req, res) => {
     res.status(HTTP_STATUS.NOT_FOUND).json({
       status: 'error',
       code: HTTP_STATUS.NOT_FOUND,
-      message: error.message,
+      message: 'not found',
     })
   }
 }
 
-module.exports = { listContacts, addContact, getContactById, removeContact }
+const updateContact = async (req, res) => {
+  const bodySchema = Joi.object({
+    name: Joi.string().min(2),
+    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+    phone: Joi.string().pattern(/^(\(\d{3}\))(\s)\d{3}(-)\d{4}$/),
+  })
+  const { error } = bodySchema.validate(req.body)
+  if (error) {
+    return res.status(400).json({
+      status: 'bad request',
+      code: 400,
+      message: 'email should ends with \'com\' or \'net\', phone should be in (XXX) XXX-XXXX format',
+    })
+  }
+
+  if (Object.keys(body).length === 0) {
+    return res.status(400).json({
+      status: 'error',
+      code: 400,
+      message: 'missing fields'
+    })
+  }
+  const body = req.body
+  const id = req.params.contactId
+
+  try {
+    const result = await Contact.findOneAndUpdate({ _id: id }, { ...body }, { new: true })
+
+    if (!result) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        status: 'error',
+        code: HTTP_STATUS.NOT_FOUND,
+        message: 'not found'
+      })
+    }
+
+    res.status(HTTP_STATUS.SUCCESS).json({
+      status: 'success',
+      code: HTTP_STATUS.SUCCESS,
+      data: result,
+      message: 'contact updated'
+    })
+  } catch (error) {
+    res.status(HTTP_STATUS.NOT_FOUND).json({ error: error.message })
+  }
+}
+
+const updateStatusContact = async (req, res) => {
+  const id = req.params.contactId
+  const favorite = req.body.favorite
+  const body = req.body
+
+  if (Object.keys(body).length === 0) {
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'missing field favorite' })
+  }
+
+  try {
+    const result = await Contact.findByIdAndUpdate({ _id: id }, { favorite: favorite }, { new: true })
+
+    if (!result) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'not found' })
+    }
+    res.status(HTTP_STATUS.SUCCESS).json({
+      status: 'success',
+      code: HTTP_STATUS.SUCCESS,
+      data: result,
+      message: 'Contact status was updated',
+    })
+  } catch (error) {
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ error: error.message })
+  }
+}
+
+module.exports = { listContacts, addContact, getContactById, removeContact, updateContact, updateStatusContact }
