@@ -86,4 +86,29 @@ const getContactById = async (req, res) => {
   }
 }
 
-module.exports = { listContacts, addContact, getContactById }
+const removeContact = async (req, res) => {
+  const id = req.params.contactId
+
+  try {
+    const result = await Contact.findOneAndDelete({ _id: id })
+
+    if (!result) {
+      res.status(HTTP_STATUS.NO_CONTENT).json({
+        status: 'error',
+        code: HTTP_STATUS.NOT_FOUND,
+        message: 'contact not found'
+      })
+    }
+    res.json({
+      message: 'contact removed'
+    })
+  } catch (error) {
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      status: 'error',
+      code: HTTP_STATUS.NOT_FOUND,
+      message: error.message,
+    })
+  }
+}
+
+module.exports = { listContacts, addContact, getContactById, removeContact }

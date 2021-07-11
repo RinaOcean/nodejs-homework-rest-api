@@ -21,15 +21,15 @@
 //   }
 // }
 
-const getContactById = async (contactId) => {
-  try {
-    const contact = await listContacts().then((contacts) => contacts.filter(contact => contact.id === contactId))
+// const getContactById = async (contactId) => {
+//   try {
+//     const contact = await listContacts().then((contacts) => contacts.filter(contact => contact.id === contactId))
 
-    return contact
-  } catch (error) {
-    console.error(error)
-  }
-}
+//     return contact
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
 
 const removeContact = async (contactId) => {
   try {
