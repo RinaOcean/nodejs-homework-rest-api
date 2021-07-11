@@ -1,7 +1,8 @@
 const Contact = require('../model/contact.model')
 const db = require('../db/connection')
-const Joi = require('joi')
+// const Joi = require('joi')
 const HTTP_STATUS = require('../helpers/httpStatusCodes')
+const joiSchema = require('../utils/validate/joiSchema')
 
 const listContacts = async (req, res) => {
   try {
@@ -23,12 +24,8 @@ const listContacts = async (req, res) => {
 }
 
 const addContact = async (req, res) => {
-  const bodySchema = Joi.object({
-    name: Joi.string().min(2).required(),
-    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
-    phone: Joi.string().pattern(/^(\(\d{3}\))(\s)\d{3}(-)\d{4}$/).required(),
-  })
-  const { error } = bodySchema.validate(req.body)
+  const { error } = joiSchema.addContact.validate(req.body)
+
   if (error) {
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       status: 'bad request',
@@ -105,12 +102,8 @@ const removeContact = async (req, res) => {
 }
 
 const updateContact = async (req, res) => {
-  const bodySchema = Joi.object({
-    name: Joi.string().min(2),
-    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
-    phone: Joi.string().pattern(/^(\(\d{3}\))(\s)\d{3}(-)\d{4}$/),
-  })
-  const { error } = bodySchema.validate(req.body)
+  const { error } = joiSchema.updateContact.validate(req.body)
+
   if (error) {
     return res.status(400).json({
       status: 'bad request',
@@ -119,6 +112,8 @@ const updateContact = async (req, res) => {
     })
   }
 
+  const body = req.body
+
   if (Object.keys(body).length === 0) {
     return res.status(400).json({
       status: 'error',
@@ -126,7 +121,7 @@ const updateContact = async (req, res) => {
       message: 'missing fields'
     })
   }
-  const body = req.body
+
   const id = req.params.contactId
 
   try {
