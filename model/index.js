@@ -7,19 +7,19 @@
 
 // const { nanoid } = require('nanoid')
 
-const db = require('../db/connection')
+// const db = require('../db/connection')
 
-const listContacts = async (req, res) => {
-  const { body } = req
-  try {
-    const result = await fs.readFile(contactsPath)
-    const allContacts = JSON.parse(rawContacts)
+// const listContacts = async (req, res) => {
+//   const { body } = req
+//   try {
+//     const result = await fs.readFile(contactsPath)
+//     const allContacts = JSON.parse(rawContacts)
 
-    return allContacts
-  } catch (error) {
-    console.error(error)
-  }
-}
+//     return allContacts
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
 
 const getContactById = async (contactId) => {
   try {
@@ -46,21 +46,21 @@ const removeContact = async (contactId) => {
   }
 }
 
-const addContact = async (body) => {
-  try {
-    const { name, email, phone } = body
+// const addContact = async (body) => {
+//   try {
+//     const { name, email, phone } = body
 
-    const newContact = { id: nanoid(), name, email, phone }
+//     const newContact = { id: nanoid(), name, email, phone }
 
-    const allContacts = await listContacts()
+//     const allContacts = await listContacts()
 
-    const updateContacts = JSON.stringify([newContact, ...allContacts])
-    fs.writeFile(contactsPath, updateContacts)
-    return newContact
-  } catch (error) {
-    console.error(error)
-  }
-}
+//     const updateContacts = JSON.stringify([newContact, ...allContacts])
+//     fs.writeFile(contactsPath, updateContacts)
+//     return newContact
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
 
 const updateContact = async (contactId, body) => {
   // const { name, email, phone } = body
@@ -78,10 +78,10 @@ const updateContact = async (contactId, body) => {
   return updatedContact
 }
 
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+// module.exports = {
+//   listContacts,
+//   getContactById,
+//   removeContact,
+//   addContact,
+//   updateContact,
+// }

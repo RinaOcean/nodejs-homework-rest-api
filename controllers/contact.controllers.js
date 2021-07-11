@@ -37,7 +37,7 @@ const addContact = async (req, res) => {
   //   })
   // }
 
-  const { body } = req
+  const body = req.body
 
   try {
     const result = await Contact.create(body)
@@ -50,11 +50,40 @@ const addContact = async (req, res) => {
     })
   } catch (error) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
-      status: 'bad request',
+      status: 'error',
       code: HTTP_STATUS.BAD_REQUEST,
       message: error.message,
     })
   }
 }
 
-module.exports = { listContacts, addContact }
+const getContactById = async (req, res) => {
+  const id = req.params.contactId
+
+  try {
+    const result = await Contact.findOne({ _id: id })
+
+    if (!result) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        status: 'error',
+        code: HTTP_STATUS.NOT_FOUND,
+        message: `There's no contact with id: ${id}`,
+      })
+    }
+
+    res.status(HTTP_STATUS.SUCCESS).json({
+      status: 'success',
+      code: HTTP_STATUS.SUCCESS,
+      data: result,
+      message: 'contact found',
+    })
+  } catch (error) {
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      status: 'not found',
+      code: HTTP_STATUS.NOT_FOUND,
+      message: error.message,
+    })
+  }
+}
+
+module.exports = { listContacts, addContact, getContactById }
