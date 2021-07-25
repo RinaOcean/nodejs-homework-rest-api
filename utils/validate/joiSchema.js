@@ -21,7 +21,11 @@ const joiSchema = {
   login: Joi.object({
     email: Joi.string().required(),
     password: Joi.string().min(4).required()
-  })
+  }),
+
+  updateSubscription: Joi.object({
+    subscription: Joi.string().required()
+  }),
 
 }
 
