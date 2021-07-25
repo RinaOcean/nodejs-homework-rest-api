@@ -1,4 +1,4 @@
-const Contact = require('../model/contact.model')
+const Contact = require('../models/contact.model')
 const db = require('../db/connection')
 // const Joi = require('joi')
 const HTTP_STATUS = require('../helpers/httpStatusCodes')
