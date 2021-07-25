@@ -4,6 +4,8 @@ const config = require('../config')
 const db = mongoose.connect(config.MONGO_CONNECTION_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false
 })
 
 const dbConnect = mongoose.connection

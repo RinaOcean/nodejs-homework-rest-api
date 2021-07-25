@@ -1,6 +1,6 @@
 const Contact = require('../models/contact.model')
 const db = require('../db/connection')
-// const Joi = require('joi')
+
 const HTTP_STATUS = require('../helpers/httpStatusCodes')
 const joiSchema = require('../utils/validate/joiSchema')
 

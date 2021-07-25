@@ -4,6 +4,7 @@ const HTTP_STATUS = {
   BAD_REQUEST: 400,
   NOT_FOUND: 404,
   NO_CONTENT: 204,
+  CONFLICT: 409,
 }
 
 module.exports = HTTP_STATUS
