@@ -10,9 +10,8 @@ const jwtTokenMiddleware = async (req, res, next) => {
   if (!token) {
     return res.status(HTTP_STATUS.UNAUTHORIZED).json({
       status: '401 Unauthorized',
-      type: 'application/json',
       responseBody: {
-        message: 'Not authorized'
+        message: 'Token is not provided'
       }
     })
   }
@@ -24,16 +23,23 @@ const jwtTokenMiddleware = async (req, res, next) => {
 
     const existingUser = await User.findOne({ _id: user.id })
 
-    if (!existingUser.token) {
-      res.status(HTTP_STATUS.UNAUTHORIZED).json({
+    if (!existingUser) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
         status: '401 Unauthorized',
-        type: 'application/json',
         responseBody: {
-          message: 'User is not signin'
+          message: 'Not authorized'
         }
       })
     }
 
+    if (!existingUser.token) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        status: '401 Unauthorized',
+        responseBody: {
+          message: 'Not logged in'
+        }
+      })
+    }
     req.user = user
 
     next()
