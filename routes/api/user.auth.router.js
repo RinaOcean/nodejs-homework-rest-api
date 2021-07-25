@@ -3,6 +3,7 @@ const authCtrl = require('../../controllers/user.auth.controllers')
 
 const authRouter = Router()
 
-authRouter.post('/users/signup', authCtrl.registration)
+authRouter.post('/signup', authCtrl.registration)
+authRouter.post('/login', authCtrl.login)
 
 module.exports = authRouter

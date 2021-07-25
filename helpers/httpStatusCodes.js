@@ -5,6 +5,7 @@ const HTTP_STATUS = {
   NOT_FOUND: 404,
   NO_CONTENT: 204,
   CONFLICT: 409,
+  UNAUTHORIZED: 401,
 }
 
 module.exports = HTTP_STATUS
