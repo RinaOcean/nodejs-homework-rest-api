@@ -11,7 +11,6 @@ const registration = async (req, res) => {
   if (error) {
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       status: '400 Bad Request',
-      type: 'application/json',
       responseBody: {
         error: error.message
       },
@@ -26,7 +25,6 @@ const registration = async (req, res) => {
     if (candidate) {
       return res.status(HTTP_STATUS.CONFLICT).json({
         status: '409 Conflict',
-        type: 'application/json',
         responseBody: {
           message: 'Email in use'
         },
@@ -40,7 +38,6 @@ const registration = async (req, res) => {
 
     res.status(HTTP_STATUS.CREATED).json({
       status: '201 Created',
-      type: 'application/json',
       responseBody: {
         user: {
           email, subscription: user.subscription,
@@ -58,7 +55,6 @@ const login = async (req, res) => {
   if (error) {
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       status: '400 Bad Request',
-      type: 'application/json',
       responseBody: {
         error: error.message
       },
@@ -95,13 +91,12 @@ const login = async (req, res) => {
       id: candidate._id,
     }
 
-    const token = jwt.sign(payload, config.SECRET_KEY, { expiresIn: '3d' })
+    const token = jwt.sign(payload, config.JWT_SECRET_KEY, { expiresIn: '1d' })
 
     const currentUser = await User.findByIdAndUpdate({ _id: candidate._id }, { token })
 
     res.status(HTTP_STATUS.SUCCESS).json({
       status: '200 OK',
-      type: 'application/json',
       responseBody: {
         token,
         user: {
@@ -113,7 +108,6 @@ const login = async (req, res) => {
   } catch (error) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
       status: '400 Bad Request',
-      type: 'application/json',
       responseBody: {
         error: error.message
       },
@@ -121,4 +115,25 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { registration, login }
+const logout = async (req, res) => {
+  const user = req.user
+
+  try {
+    const currentUser = await User.findOneAndUpdate({ _id: user.id }, { token: null })
+
+    if (!currentUser) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        status: '401 Unauthorized',
+        responseBody: {
+          message: 'Not authorized'
+        }
+      })
+    }
+
+    res.status(HTTP_STATUS.NO_CONTENT).json()
+  } catch (error) {
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ error: error.message })
+  }
+}
+
+module.exports = { registration, login, logout }
