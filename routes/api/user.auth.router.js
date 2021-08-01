@@ -1,7 +1,6 @@
 const { Router } = require('express')
 const authCtrl = require('../../controllers/user.auth.controllers')
 const tokenMiddleware = require('../../middlewares/jwtTokemnMiddleware')
-
 const authRouter = Router()
 
 authRouter.post('/signup', authCtrl.registration)

@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const joiSchema = require('../utils/validate/joiSchema')
 const config = require('../config')
+const gravatar = require('gravatar')
+
 
 const registration = async (req, res) => {
   const { error } = joiSchema.registration.validate(req.body)
@@ -18,6 +20,9 @@ const registration = async (req, res) => {
   }
 
   const { email, password } = req.body
+  const defaultAvatarUrl = gravatar.url(email, { protocol: 'http', d: 'monsterid' })
+
+
 
   try {
     const candidate = await User.findOne({ email })
@@ -34,13 +39,15 @@ const registration = async (req, res) => {
     const salt = bcrypt.genSaltSync(10)
     const hashedPassword = bcrypt.hashSync(password, salt)
 
-    const user = await User.create({ email, password: hashedPassword })
+    const user = await User.create({ email, password: hashedPassword, avatarURL: defaultAvatarUrl })
 
     res.status(HTTP_STATUS.CREATED).json({
       status: '201 Created',
       responseBody: {
         user: {
-          email, subscription: user.subscription,
+          email,
+          subscription: user.subscription,
+          avatarURL: user.avatarURL,
         }
       }
     })

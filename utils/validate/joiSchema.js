@@ -26,6 +26,17 @@ const joiSchema = {
   updateSubscription: Joi.object({
     subscription: Joi.string().required()
   }),
+  updateAvatar: Joi.object({
+    fieldname: Joi.string(),
+    originalname: Joi.string(),
+    encoding: Joi.string(),
+    mimetype: Joi.string().valid('image/png', 'image/jpeg'),
+    destination: Joi.string(),
+    filename: Joi.string(),
+    path: Joi.string(),
+    size: Joi.number(),
+
+  }).required()
 
 }
 

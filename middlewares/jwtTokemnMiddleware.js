@@ -17,7 +17,6 @@ const jwtTokenMiddleware = async (req, res, next) => {
   }
 
   try {
-    // jwt.verify(token, config.JWT_SECRET_KEY)
 
     const user = jwt.verify(token, config.JWT_SECRET_KEY)
 
