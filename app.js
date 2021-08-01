@@ -1,6 +1,9 @@
 const express = require('express')
+
 const logger = require('morgan')
 const cors = require('cors')
+const multer = require('multer')
+const path = require('path')
 
 const contactsRouter = require('./routes/api/contacts.router')
 const userAuthRouter = require('./routes/api/user.auth.router')
@@ -9,6 +12,10 @@ const usersRouter = require('./routes/api/users.router')
 const app = express()
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
+
+const FullPath = path.join(__dirname, 'public/avatars')
+app.use('/avatars', express.static(FullPath))
+// app.use(express.static('/public'))
 
 app.use(logger(formatsLogger))
 app.use(cors())
