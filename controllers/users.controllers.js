@@ -1,6 +1,7 @@
 const User = require('../models/user.model')
 const HTTP_STATUS = require('../helpers/httpStatusCodes')
 const joiSchema = require('../utils/validate/joiSchema')
+const config = require('../config')
 const path = require('path')
 const fs = require('fs/promises')
 const Jimp = require('jimp')
@@ -81,17 +82,19 @@ const updateAvatar = async (req, res) => {
 
   const uploadDir = path.join(process.cwd(), 'public/avatars')
   const fileName = path.join(uploadDir, originalname)
+  const URL = `http://localhost:${config.PORT}/avatars/`
+  const fileURL = path.join(URL, originalname)
   const resizedImg = await Jimp.read(tempName)
   resizedImg.resize(250, 250)
 
   try {
-    await User.findByIdAndUpdate({ _id: currentUser.id }, { avatarURL: fileName })
+    await User.findByIdAndUpdate({ _id: currentUser.id }, { avatarURL: fileURL })
 
     res.status(HTTP_STATUS.SUCCESS).json({
       status: 'success',
       message: 'users avatar updated',
       responseBody: {
-        avatarURL: fileName,
+        avatarURL: fileURL,
       }
     })
     fs.rename(tempName, fileName)
