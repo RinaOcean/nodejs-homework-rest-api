@@ -85,7 +85,7 @@ const updateAvatar = async (req, res) => {
   const URL = `http://localhost:${config.PORT}/avatars/`
   const fileURL = path.join(URL, originalname)
   const resizedImg = await Jimp.read(tempName)
-  resizedImg.resize(250, 250)
+  resizedImg.resize(250, 250).write(tempName)
 
   try {
     await User.findByIdAndUpdate({ _id: currentUser.id }, { avatarURL: fileURL })
