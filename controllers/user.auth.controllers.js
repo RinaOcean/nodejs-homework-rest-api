@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken')
 const joiSchema = require('../utils/validate/joiSchema')
 const config = require('../config')
 const gravatar = require('gravatar')
-
-
+const { v4: uuidv4 } = require('uuid')
+const sendMail = require('../utils/sendMail/sendMail')
+require('dotenv').config()
 const registration = async (req, res) => {
   const { error } = joiSchema.registration.validate(req.body)
 
@@ -21,8 +22,6 @@ const registration = async (req, res) => {
 
   const { email, password } = req.body
   const defaultAvatarUrl = gravatar.url(email, { protocol: 'http', d: 'monsterid' })
-
-
 
   try {
     const candidate = await User.findOne({ email })
@@ -39,7 +38,10 @@ const registration = async (req, res) => {
     const salt = bcrypt.genSaltSync(10)
     const hashedPassword = bcrypt.hashSync(password, salt)
 
-    const user = await User.create({ email, password: hashedPassword, avatarURL: defaultAvatarUrl })
+    const verificationToken = uuidv4()
+
+    const user = await User.create({ email, password: hashedPassword, avatarURL: defaultAvatarUrl, verifyToken: verificationToken })
+    await sendMail({ to: email, subject: 'verification', html: `<h1>Email verification</h1><p>To verificate your email, please, click below</p><a href=http://localhost:5000/users/verify/${verificationToken}>Click</a>` })
 
     res.status(HTTP_STATUS.CREATED).json({
       status: '201 Created',
@@ -54,6 +56,33 @@ const registration = async (req, res) => {
   } catch (error) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({ error: error.message })
   }
+}
+
+const verification = async (req, res) => {
+  const verificationToken = req.params.verificationToken
+
+  try {
+    const verifiedUser = await User.findOneAndUpdate({ verifyToken: verificationToken }, { verify: true, verifyToken: null })
+
+    if (!verifiedUser) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        status: '404 Not Found',
+        responseBody: {
+          message: 'User not found',
+        }
+      })
+    }
+
+    res.status(HTTP_STATUS.SUCCESS).json({
+      status: '200 OK',
+      responseBody: {
+        message: 'Verification successful',
+      }
+    })
+  } catch (error) {
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ error: error.message })
+  }
+
 }
 
 const login = async (req, res) => {
@@ -143,4 +172,4 @@ const logout = async (req, res) => {
   }
 }
 
-module.exports = { registration, login, logout }
+module.exports = { registration, login, logout, verification }
