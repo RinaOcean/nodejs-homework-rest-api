@@ -7,7 +7,8 @@ const config = require('../config')
 const gravatar = require('gravatar')
 const { v4: uuidv4 } = require('uuid')
 const sendMail = require('../utils/sendMail/sendMail')
-require('dotenv').config()
+// require('dotenv').config()
+
 const registration = async (req, res) => {
   const { error } = joiSchema.registration.validate(req.body)
 
@@ -107,6 +108,15 @@ const login = async (req, res) => {
         status: '401 Unauthorized',
         responseBody: {
           message: 'Email or password is wrong'
+        }
+      })
+    }
+
+    if (!candidate.verify) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        status: '401 Unauthorized',
+        responseBody: {
+          message: 'Email is not verified'
         }
       })
     }
