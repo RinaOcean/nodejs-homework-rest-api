@@ -7,7 +7,6 @@ const config = require('../config')
 const gravatar = require('gravatar')
 const { v4: uuidv4 } = require('uuid')
 const sendMail = require('../utils/sendMail/sendMail')
-// require('dotenv').config()
 
 const registration = async (req, res) => {
   const { error } = joiSchema.registration.validate(req.body)
@@ -84,6 +83,48 @@ const verification = async (req, res) => {
     res.status(HTTP_STATUS.BAD_REQUEST).json({ error: error.message })
   }
 
+}
+
+const repeatVerification = async (req, res) => {
+  const { error } = joiSchema.repeatVerify.validate(req.body)
+
+  if (error) {
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({
+      status: '400 Bad Request',
+      responseBody: {
+        error: error.message
+      },
+    })
+  }
+
+  const { email } = req.body
+  // if (!email) {
+  //   return res.status(HTTP_STATUS.BAD_REQUEST).json({
+  //     message: 'missing required field email'
+  //   })
+  // }
+
+  try {
+    const user = await User.findOne({ email })
+
+    if (user.verify) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        status: '400 Bad Request',
+        responseBody: {
+          message: 'Verification has already been passed',
+        },
+      })
+    }
+    await sendMail({ to: email, subject: 'verification', html: `<h1>Email verification</h1><p>To verificate your email, please, click below</p><a href=http://localhost:5000/users/verify/${user.verifyToken}>Click</a>` })
+    res.status(HTTP_STATUS.SUCCESS).json({
+      status: '200 OK',
+      responseBody: {
+        message: 'Verification email sent',
+      }
+    })
+  } catch (error) {
+    res.status(HTTP_STATUS.BAD_REQUEST).json({ error: error.message })
+  }
 }
 
 const login = async (req, res) => {
@@ -182,4 +223,4 @@ const logout = async (req, res) => {
   }
 }
 
-module.exports = { registration, login, logout, verification }
+module.exports = { registration, login, logout, verification, repeatVerification }

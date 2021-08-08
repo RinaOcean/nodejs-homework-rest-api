@@ -36,7 +36,10 @@ const joiSchema = {
     path: Joi.string(),
     size: Joi.number(),
 
-  }).required()
+  }).required(),
+  repeatVerify: Joi.object({
+    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
+  }),
 
 }
 
